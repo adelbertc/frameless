@@ -8,7 +8,7 @@ import org.apache.spark.sql.catalyst.expressions.objects._
 import org.apache.spark.sql.catalyst.util.{ArrayBasedMapData, GenericArrayData}
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
-import shapeless._
+import shapeless._, shapeless.labelled.FieldType
 import scala.reflect.ClassTag
 
 abstract class TypedEncoder[T](implicit val classTag: ClassTag[T]) extends Serializable {
@@ -399,13 +399,21 @@ object TypedEncoder {
         }
       }
 
-  /** Encodes things as records if there is not Injection defined */
-  implicit def usingDerivation[F, G <: HList]
-    (implicit
-      i0: LabelledGeneric.Aux[F, G],
-      i1: Lazy[RecordEncoderFields[G]],
-      i2: ClassTag[F]
-    ): TypedEncoder[F] = new RecordEncoder[F, G]
+  implicit def recordEncoder[F <: HList : ClassTag](
+    implicit
+      i0: Lazy[RecordCatalystCodec[F]]
+  ): TypedEncoder[F] =
+    new NewRecordEncoder
+
+  // This encoder won't actually be used; currently added just to appease TypedColumn.
+  implicit def fieldTypeEncoder[K <: Symbol, V](implicit i0: TypedEncoder[V]) =
+    new TypedEncoder[FieldType[K, V]] {
+      def nullable: Boolean = false
+      def jvmRepr: DataType = i0.jvmRepr
+      def catalystRepr: DataType = i0.catalystRepr
+      def toCatalyst(path: Expression): Expression = i0.toCatalyst(path)
+      def fromCatalyst(path: Expression): Expression = i0.fromCatalyst(path)
+    }
 
   /** Encodes things using a Spark SQL's User Defined Type (UDT) if there is one defined in implicit */
   implicit def usingUserDefinedType[A >: Null : UserDefinedType : ClassTag]: TypedEncoder[A] = {
@@ -423,4 +431,13 @@ object TypedEncoder {
         Invoke(udtInstance, "deserialize", ObjectType(udt.userClass), Seq(path))
     }
   }
+
+  /** Encodes things as records if there is not Injection defined */
+  implicit def usingDerivation[F, G <: HList]
+    (implicit
+      i0: LabelledGeneric.Aux[F, G],
+      i1: Lazy[RecordCatalystCodec[G]],
+      i2: ClassTag[F]
+    ): TypedEncoder[F] =
+      new OldRecordEncoder[F, G]
 }
