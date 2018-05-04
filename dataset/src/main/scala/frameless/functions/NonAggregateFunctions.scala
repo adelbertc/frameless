@@ -386,4 +386,107 @@ trait NonAggregateFunctions {
     */
   def year[T](str: AbstractTypedColumn[T, String]): str.ThisType[T, Option[Int]] =
     str.typed(untyped.year(str.untyped))
+
+  /** Non-Aggregate function: Computes the floor of the given value.
+    *
+    * apache/spark
+    */
+  def floor[A, T](col: AbstractTypedColumn[T, A])(implicit i0: CatalystCast[A, Double]): col.ThisType[T, Int] =
+    col.typed(untyped.floor(col.cast[Double].untyped)) //TODO: output type
+
+  /** Non-Aggregate function: Computes the ceiling of the given value.
+    *
+    * apache/spark
+    */
+  def ceil[A, T](col: AbstractTypedColumn[T, A])(implicit i0: CatalystCast[A, Double]): col.ThisType[T, Int] =
+    col.typed(untyped.ceil(col.cast[Double].untyped)) //TODO: output type
+
+  /** Non-Aggregate function: Returns the value of the first argument raised to the power of the second argument.
+    *
+    * apache/spark
+    */
+  def pow[B, T](left: Double, right: AbstractTypedColumn[T, B])(
+                 implicit
+                 i1: CatalystCast[B, Double]
+  ): right.ThisType[T, Double] =
+    right.typed(untyped.pow(left, right.cast[Double].untyped))
+
+  /** Non-Aggregate function: Returns the value of the first argument raised to the power of the second argument.
+    *
+    * apache/spark
+    */
+  def pow[A, T](left: AbstractTypedColumn[T, A], right: Double)(
+                 implicit
+                 i0: CatalystCast[A, Double]
+  ): left.ThisType[T, Double] =
+    left.typed(untyped.pow(left.cast[Double].untyped, right))
+
+  /** Non-Aggregate function: Returns the value of the first argument raised to the power of the second argument.
+    *
+    * apache/spark
+    */
+  def pow[A, B, T](left: AbstractTypedColumn[T, A], right: AbstractTypedColumn[T, B])(
+    implicit
+      i0: CatalystCast[A, Double],
+      i1: CatalystCast[B, Double]
+  ): left.ThisType[T, Double] =
+    left.typed(untyped.pow(left.cast[Double].untyped, right.cast[Double].untyped))
+
+  /** Non-Aggregate function: Computes the square root of the specified float value.
+    *
+    * apache/spark
+    */
+  def sqrt[A, T](col: AbstractTypedColumn[T, A])(implicit i0: CatalystCast[A, Double]): col.ThisType[T, Double] =
+    col.typed(untyped.sqrt(col.cast[Double].untyped))
+
+  /** Non-Aggregate function: Returns the double value that is closest in value to the argument and
+    * is equal to a mathematical integer.
+    *
+    * apache/spark
+    */
+  def rint[A, T](col: AbstractTypedColumn[T, A])(implicit i0: CatalystCast[A, Double]): col.ThisType[T, Double] =
+    col.typed(untyped.rint(col.cast[Double].untyped))
+
+  /** Non-Aggregate function: Computes the exponential of the given value.
+    *
+    * apache/spark
+    */
+  def exp[A, T](col: AbstractTypedColumn[T, A])(implicit i0: CatalystCast[A, Double]): col.ThisType[T, Double] =
+    col.typed(untyped.exp(col.cast[Double].untyped))
+
+  /** Non-Aggregate function: Computes the exponential of the given value minus one.
+    *
+    * apache/spark
+    */
+  def expm1[A, T](col: AbstractTypedColumn[T, A])(implicit i0: CatalystCast[A, Double]): col.ThisType[T, Double] =
+    col.typed(untyped.expm1(col.cast[Double].untyped))
+
+  /** Non-Aggregate function: Computes the natural logarithm of the given value.
+    *
+    * apache/spark
+    */
+  def log[A, T](col: AbstractTypedColumn[T, A])(implicit i0: CatalystCast[A, Double]): col.ThisType[T, Double] =
+    col.typed(untyped.log(col.cast[Double].untyped))
+
+  /** Non-Aggregate function: Computes the natural logarithm of the given value plus one.
+    *
+    * apache/spark
+    */
+  def log1p[A, T](col: AbstractTypedColumn[T, A])(implicit i0: CatalystCast[A, Double]): col.ThisType[T, Double] =
+    col.typed(untyped.log1p(col.cast[Double].untyped))
+
+  /** Non-Aggregate function: Computes the logarithm of the given column in base 2.
+    *
+    * apache/spark
+    */
+  def log2[A, T](col: AbstractTypedColumn[T, A])(implicit i0: CatalystCast[A, Double]): col.ThisType[T, Double] =
+    col.typed(untyped.log2(col.cast[Double].untyped))
+
+  /** Non-Aggregate function: Computes the logarithm of the given value in base 10.
+    *
+    * apache/spark
+    */
+  def log10[A, T](col: AbstractTypedColumn[T, A])(implicit i0: CatalystCast[A, Double]): col.ThisType[T, Double] =
+    col.typed(untyped.log10(col.cast[Double].untyped))
+
 }
